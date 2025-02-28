@@ -93,8 +93,14 @@ export default class EditProduct extends Component {
     }
 
     handleFileChange = (e) => {
-        this.setState({ selectedFiles: e.target.files })
+        const selectedFiles = Array.from(e.target.files)
+
+        this.setState({ selectedFiles }, () => {
+            const previews = selectedFiles.map(file => URL.createObjectURL(file))
+            this.setState({ previewImages: [...this.state.previewImages, ...previews] })
+        })
     }
+
 
     handleSubmit = (e) => {
         e.preventDefault()
@@ -110,7 +116,6 @@ export default class EditProduct extends Component {
             formData.append("category", this.state.category)
             formData.append("stock", parseInt(this.state.stock))
             formData.append("price", parseFloat(this.state.price))
-
 
             // Append existing images (as filenames)
             this.state.images.forEach(img => {
