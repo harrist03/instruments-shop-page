@@ -54,10 +54,8 @@ export default class AddProduct extends Component {
             //     formData.append("images", file)
             // })
 
-            if(this.state.selectedFiles)
-            {
-                for(let i = 0; i < this.state.selectedFiles.length; i++)
-                {
+            if(this.state.selectedFiles) {
+                for(let i = 0; i < this.state.selectedFiles.length; i++) {
                     formData.append("images", this.state.selectedFiles[i])
                 }
             }

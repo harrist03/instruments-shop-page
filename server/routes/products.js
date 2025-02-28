@@ -94,29 +94,51 @@ const createProduct =  (req, res) => {
 
 // Update one record
 const updateProduct = (req, res) => {
-    // Use the new product details to update an existing product document
-    productsModel.findByIdAndUpdate(req.params.id, { $set: req.body }, (error, data) => {
-        res.json(data)
-    })
+    const { name, brand, colour, category, stock, price } = req.body
+
+    const existingImages = req.body.existingImages
+        ? Array.isArray(req.body.existingImages)
+            ? req.body.existingImages
+            : [req.body.existingImages]
+        : []
+
+    console.log("Existing Images:", existingImages)
+
+    const newImages = req.files ? req.files.map(file => file.filename) : []
+
+    const allImages = [...existingImages, ...newImages]
+        .filter(img => img)
+        .map(img => ({ filename: img }))  // Convert to objects
+
+    console.log("All Images:", allImages)  // Debugging
+
+    productsModel.findByIdAndUpdate(req.params.id, {
+        name, brand, colour, category, stock: parseInt(stock), price: parseFloat(price), images: allImages
+    }, { new: true })
+        .then(updatedProduct => res.json(updatedProduct))
+        .catch(err => {
+            console.error("MongoDB Error:", err)
+            res.status(500).json({ errorMessage: err.message })
+        })
 }
 
-// Delete one record
-router.delete(`/products/:id`, (req, res) =>
-{
-    jwt.verify(req.headers.authorization, JWT_PRIVATE_KEY, {algorithm: "HS256"}, (err, decodedToken) => {
-        if (err) {
-            res.json({errorMessage: `User is not logged in`})
-        } else {
-            if (decodedToken.accessLevel >= process.env.ACCESS_LEVEL_ADMIN) {
-                productsModel.findByIdAndRemove(req.params.id, (error, data) => {
-                    res.json(data)
-                })
-            } else {
-                res.json({errorMessage: `User is not an administrator, so they cannot delete records`})
-            }
-        }
-    })
-})
+// // Delete one record
+// router.delete(`/products/:id`, (req, res) =>
+// {
+//     jwt.verify(req.headers.authorization, JWT_PRIVATE_KEY, {algorithm: "HS256"}, (err, decodedToken) => {
+//         if (err) {
+//             res.json({errorMessage: `User is not logged in`})
+//         } else {
+//             if (decodedToken.accessLevel >= process.env.ACCESS_LEVEL_ADMIN) {
+//                 productsModel.findByIdAndRemove(req.params.id, (error, data) => {
+//                     res.json(data)
+//                 })
+//             } else {
+//                 res.json({errorMessage: `User is not an administrator, so they cannot delete records`})
+//             }
+//         }
+//     })
+// })
 
 
 const deleteProduct = (req, res) => {
@@ -124,10 +146,11 @@ const deleteProduct = (req, res) => {
         res.json(data)
     })
 }
+
 router.post("/products", verifyUsersJWTPassword, checkAdminAccess, upload.array("images", parseInt(process.env.MAX_NUMBER_OF_UPLOAD_FILES_ALLOWED)), createProduct)
 router.get(`/products`, getAllProducts)
 router.get(`/products/:id`, verifyUsersJWTPassword, getProduct)
-router.put(`/products/:id`, verifyUsersJWTPassword, updateProduct)
+router.put(`/products/:id`, verifyUsersJWTPassword, upload.array("images", parseInt(process.env.MAX_NUMBER_OF_UPLOAD_FILES_ALLOWED)), updateProduct)
 router.delete(`/products/:id`, verifyUsersJWTPassword, checkAdminAccess, deleteProduct)
 
 module.exports = router
