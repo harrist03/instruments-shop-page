@@ -101,6 +101,20 @@ export default class EditProduct extends Component {
         })
     }
 
+    handleRemoveImage = (index) => {
+        // Remove preview image from state
+        const updatedPreviews = [...this.state.previewImages]
+        updatedPreviews.splice(index, 1)
+
+        // Remove filename from images array (for existing images only)
+        const updatedImages = [...this.state.images]
+        updatedImages.splice(index, 1)
+
+        this.setState({
+            previewImages: updatedPreviews,
+            images: updatedImages
+        })
+    }
 
     handleSubmit = (e) => {
         e.preventDefault()
@@ -272,10 +286,18 @@ export default class EditProduct extends Component {
                     {/* Image Previews */}
                     <div className="image-preview-container">
                         {this.state.previewImages.map((img, index) => (
-                            <img key={index} src={img} alt="Preview" className="image-preview" />
+                            <div key={index} className="image-preview-wrapper">
+                                <img src={img} alt="Preview" className="image-preview" />
+                                <button
+                                    type="button"
+                                    className="remove-image-button"
+                                    onClick={() => this.handleRemoveImage(index)}
+                                >
+                                    ❌
+                                </button>
+                            </div>
                         ))}
                     </div>
-
 
                     <LinkInClass value="Update" className="green-button" onClick={this.handleSubmit}/>
                     <Link className="red-button" to={"/DisplayAllProducts"}>Cancel</Link>
