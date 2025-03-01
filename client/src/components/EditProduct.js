@@ -108,11 +108,19 @@ export default class EditProduct extends Component {
 
         // Remove filename from images array (for existing images only)
         const updatedImages = [...this.state.images]
-        updatedImages.splice(index, 1)
+        const removedImage = updatedImages.splice(index, 1)[0]
 
         this.setState({
             previewImages: updatedPreviews,
             images: updatedImages
+        }, () => {
+            axios.delete(`${SERVER_HOST}/products/image/${removedImage.filename}`, {headers: { "authorization": localStorage.token }})
+                .then(res => {
+                    console.log("Image deleted successfully:", res.data.message)
+                })
+                .catch(err => {
+                    console.error("Failed to delete image:", err)
+                })
         })
     }
 

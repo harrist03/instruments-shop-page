@@ -140,12 +140,25 @@ const updateProduct = (req, res) => {
 //     })
 // })
 
-
 const deleteProduct = (req, res) => {
     productsModel.findByIdAndRemove(req.params.id, (error, data) => {
         res.json(data)
     })
 }
+
+// Delete Image Route
+router.delete(`/products/image/:filename`, verifyUsersJWTPassword, checkAdminAccess, (req, res) => {
+    const filePath = `${process.env.UPLOADED_FILES_FOLDER}/${req.params.filename}`
+
+    fs.unlink(filePath, (err) => {
+        if (err) {
+            console.error(`Failed to delete image: ${req.params.filename}`, err)
+            return res.status(500).json({ errorMessage: `Failed to delete image` })
+        }
+        console.log(`Image deleted: ${req.params.filename}`)
+        res.json({ message: `Image deleted successfully` })
+    })
+})
 
 router.post("/products", verifyUsersJWTPassword, checkAdminAccess, upload.array("images", parseInt(process.env.MAX_NUMBER_OF_UPLOAD_FILES_ALLOWED)), createProduct)
 router.get(`/products`, getAllProducts)

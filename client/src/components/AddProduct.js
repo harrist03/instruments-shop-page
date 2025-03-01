@@ -18,7 +18,8 @@ export default class AddProduct extends Component {
             category: "",
             stock: "",
             price: "",
-            selectedFiles: null,
+            selectedFiles: [],
+            previewImages: [],
             redirectToDisplayAllProducts: localStorage.accessLevel < ACCESS_LEVEL_ADMIN
         }
     }
@@ -32,7 +33,30 @@ export default class AddProduct extends Component {
     }
 
     handleFileChange = (e) => {
-        this.setState({selectedFiles: e.target.files})
+        const selectedFiles = Array.from(e.target.files)
+
+        const updatedFiles = [...this.state.selectedFiles, ...selectedFiles]
+        const newPreviews = selectedFiles.map(file => URL.createObjectURL(file))
+
+        this.setState({
+            selectedFiles: updatedFiles,
+            previewImages: [...this.state.previewImages, ...newPreviews]
+        })
+    }
+
+    handleRemoveImage = (index) => {
+        // Remove preview image from state
+        const updatedPreviews = [...this.state.previewImages]
+        updatedPreviews.splice(index, 1)
+
+        // Remove filename from images array
+        const updatedFiles = [...this.state.selectedFiles]
+        updatedFiles.splice(index, 1)
+
+        this.setState({
+            previewImages: updatedPreviews,
+            selectedFiles: updatedFiles
+        })
     }
 
     handleSubmit = (e) => {
@@ -50,9 +74,7 @@ export default class AddProduct extends Component {
             formData.append("stock", this.state.stock)
             formData.append("price", this.state.price)
 
-            // this.state.selectedFiles.forEach(file => {
-            //     formData.append("images", file)
-            // })
+
 
             if(this.state.selectedFiles) {
                 for(let i = 0; i < this.state.selectedFiles.length; i++) {
@@ -195,6 +217,22 @@ export default class AddProduct extends Component {
                     <div>
                         <label>Upload Images</label>
                         <input type="file" multiple onChange={this.handleFileChange} />
+                    </div>
+
+                    {/* Image Previews */}
+                    <div className="image-preview-container">
+                        {this.state.previewImages.map((img, index) => (
+                            <div key={index} className="image-preview-wrapper">
+                                <img src={img} alt="Preview" className="image-preview" />
+                                <button
+                                    type="button"
+                                    className="remove-image-button"
+                                    onClick={() => this.handleRemoveImage(index)}
+                                >
+                                    ❌
+                                </button>
+                            </div>
+                        ))}
                     </div>
 
                     <LinkInClass value="Add" className="green-button" onClick={this.handleSubmit} />

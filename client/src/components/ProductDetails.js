@@ -40,10 +40,12 @@ export default class ProductDetails extends Component {
                 <div className="product-details-container">
                     <div className="product-details">
                         <div className="product-image">
-                            <img
-                                src={product.images && product.images.length > 0 ? product.images[0] : "https://st4.depositphotos.com/14953852/24787/v/450/depositphotos_247872612-stock-illustration-no-image-available-icon-vector.jpg"}
-                                alt={product.name}
-                            />
+                            {/*{product.images.forEach(image => */}
+                            {/*    <img src={image.file} key={image.id} />*/}
+                            {/*    alt={product.name}*/}
+                            {/*    />*/}
+                            {/*)}*/}
+
                         </div>
                         <div className="product-info">
                             <h2>{product.name}</h2>

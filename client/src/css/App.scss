@@ -370,6 +370,35 @@ html, body {
   box-shadow: 2px 6px 24px rgba(0, 0, 0, 0.5);
 }
 
+// Image upload preview
+.image-preview-wrapper {
+  position: relative;
+  display: inline-block;
+  margin: 10px;
+}
+
+.image-preview {
+  width: 150px;
+  height: 150px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
+.remove-image-button {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  width: 25px;
+  height: 25px;
+  text-align: center;
+  font-size: 16px;
+}
+
+
 // Responsive Design
 @media (max-width: 768px) {
   .navbar {
